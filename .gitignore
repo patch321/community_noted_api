@@ -1,0 +1,64 @@
+# Byte-compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Secret settings
+.env
+
+# Django migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# SQLite database
+db.sqlite3
+
+# Static and media files
+/staticfiles/
+/media/
+/static/
+/mediafiles/
+
+# Compiled assets
+*.log
+
+# Docker files
+*.log
+docker-compose.override.yml
+
+# Node modules
+node_modules/
+
+# Build files
+/dist/
+/build/
+
+# Render, Heroku, or other PaaS
+*.env
+*.env.*
+
+# DB
+db.sqlite3
+
+
+# SSL certs
+certs/
+*.pem
+*.crt
+*.key
+*.csr
+*.cnf

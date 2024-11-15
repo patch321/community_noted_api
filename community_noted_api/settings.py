@@ -29,6 +29,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Initialize environment variables
+env = environ.Env()
+environ.Env.read_env()
+
 
 # Application definition
 
@@ -54,26 +58,6 @@ MIDDLEWARE = [
 ]
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Initialize environment variables
-env = environ.Env()
-environ.Env.read_env()
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
-        'OPTIONS': {
-            'ssl': {
-                'ca': str(BASE_DIR / 'certs/ca-certificate.crt'),
-            },
-        },
-    }
-}
 
 ROOT_URLCONF = 'community_noted_api.urls'
 
@@ -101,8 +85,17 @@ WSGI_APPLICATION = 'community_noted_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
+        'OPTIONS': {
+            'ssl': {
+                'ca': 'certs/ca-cert.pem',
+            },
+        },
     }
 }
 

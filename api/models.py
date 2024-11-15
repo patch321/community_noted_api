@@ -28,7 +28,7 @@ class Note(models.Model):
     is_media_note = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'Notes'
+        db_table = 'notes'
 
     def __str__(self):
         return f"Note {self.note_id}"
