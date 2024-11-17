@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-(0ctwz&@d+_*skv^d1k=fxfisqog(&ly#f0_3+ovu2q3!ihr*l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'communitynoted@appspot.gserviceaccount.com',
+    'communitynoted.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Initialize environment variables
 env = environ.Env()
