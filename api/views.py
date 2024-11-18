@@ -1,24 +1,63 @@
-from django.http import JsonResponse
-from datetime import datetime
-from api.utils import download_and_decompress_file, load_data_into_database
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 import os
+from datetime import datetime
+from api.utils import download_and_decompress_file, load_data_into_database, check_for_new_data
+import logging
 
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+@api_view(['POST'])
 def download_and_process_view(request):
-    download_url = 'https://ton.twimg.com/birdwatch-public-data/2024/MONTH/DATE/notes/notes-00000.tsv'  # Replace with your actual URL
-    local_file_path = '/tmp/notes.tsv'
+    """
+    API endpoint to download and process new data if available.
+    """
+    # Get today's date and format it
+    current_date = datetime.now()
+    date_path = current_date.strftime('%Y/%m/%d')  # This will format as '2024/03/21' (for example)
 
+    # Construct the download URL with current date
+    download_url = f'https://ton.twimg.com/birdwatch-public-data/{date_path}/notes/notes-00000.tsv'
+    local_file_path = '/tmp/notes.tsv'
+    
     try:
-        # Step 1: Download and decompress the file
-        current_date = datetime.now().strftime('%Y/%m/%d')
-        download_url = download_url.replace('MONTH', current_date.split('/')[1]).replace('DATE', current_date.split('/')[2])
+        # Check if new data is available
+        is_new_data, download_url = check_for_new_data(download_url)
+        if not is_new_data:
+            return Response({"message": "No new data to process today."}, status=200)
+
+        # Check if already processed
+        if has_been_processed_today():
+            logger.info("Data has already been processed today, skipping download")
+            return Response({"message": "Data has already been processed today."}, status=200)
+
+        # Download and process the file
         download_and_decompress_file(download_url, local_file_path)
 
-        # Step 2: Load data into the database
+        # Load data into the database
         total_records = load_data_into_database(local_file_path)
-        return JsonResponse({"message": f"Successfully processed {total_records} records."})
+
+        # Save the current date as the last processed date
+        current_date = datetime.now().strftime('%Y/%m/%d')
+        with open("last_processed_date.txt", "w") as f:
+            f.write(current_date)
+
+        return Response({"message": f"Successfully processed {total_records} records."}, status=200)
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return Response({"error": str(e)}, status=500)
+
     finally:
-        # Clean up the local file after processing
+        # Ensure the file is removed after processing
         if os.path.exists(local_file_path):
             os.remove(local_file_path)
+
+def has_been_processed_today():
+    """Check if the data has already been processed today."""
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    # You might want to implement this check against your database
+    # For now, we'll just log the check
+    logger.info(f"Checking if data was already processed for {current_date}")
+    return False  # Replace with actual implementation
